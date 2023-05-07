@@ -5948,6 +5948,31 @@ bool readInputFile(const QCString &fileName,BufStr &inBuf,bool filter,bool isSou
     //printf(".......resizing from %d to %d result=[%s]\n",oldPos+size,oldPos+newSize,qPrint(dest));
   }
   inBuf.addChar(0);
+
+  char* string = inBuf.data();
+
+  size_t offset = 2;
+  const size_t end = inBuf.size();
+
+  // Removing /// comments after reading the file.
+  while (offset < end)
+  {
+    if (string[offset] != '/' || string[offset - 1] != '/' || string[offset - 2] != '/')
+    {
+      offset++;
+      continue;
+    }
+
+    // When three / have been read.
+    offset -= 2;
+
+    // Erase line until the end.
+    while (string[offset] != '\n' && offset < end)
+    {
+      string[offset++] = ' ';
+    }
+  }
+
   return TRUE;
 }
 
