@@ -179,7 +179,8 @@ static std::multimap< std::string, const Entry* > g_classEntries;
 static StringVector     g_inputFiles;
 static StringSet        g_compoundKeywords;        // keywords recognised as compounds
 static OutputList      *g_outputList = 0;          // list of output generating objects
-static StringSet        g_usingDeclarations; // used classes
+static StringSet        g_usingDeclarations;       // used classes
+static QCString         g_userOutputDirectory;     // specified by the user using the '-o' option
 static bool             g_successfulRun = FALSE;
 static bool             g_dumpSymbolMap = FALSE;
 static bool             g_useOutputTemplate = FALSE;
@@ -10907,6 +10908,15 @@ void readConfiguration(int argc, char **argv)
           exit(1);
         }
         break;
+      case 'o':
+        g_userOutputDirectory = getArg(argc, argv, optInd);
+        if (g_userOutputDirectory.isEmpty())
+        {
+          err("option \"-o\" is missing the output path.\n");
+          cleanUpDoxygen();
+          exit(1);
+        }
+        break;
       case 't':
         {
 #if ENABLE_TRACING
@@ -11711,6 +11721,13 @@ void parseInput()
    *            Make sure the output directory exists
    **************************************************************************/
   QCString outputDirectory = Config_getString(OUTPUT_DIRECTORY);
+
+  // allows users to specify a custom output directory via the command line '-o' option
+  if (!g_userOutputDirectory.isEmpty())
+  {
+    outputDirectory = g_userOutputDirectory;
+  }
+
   if (outputDirectory.isEmpty())
   {
     outputDirectory = Config_updateString(OUTPUT_DIRECTORY,Dir::currentDirPath().c_str());

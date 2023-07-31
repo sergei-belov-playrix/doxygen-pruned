@@ -245,7 +245,7 @@ bool Dir::mkdir(const std::string &path,bool acceptsAbsPath) const
   }
   else
   {
-    return fs::create_directory(result,ec);
+    return fs::create_directories(result,ec);
   }
 }
 
